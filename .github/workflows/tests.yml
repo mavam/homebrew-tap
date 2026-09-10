@@ -1,0 +1,51 @@
+name: Test formulae
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash -euo pipefail {0}
+
+jobs:
+  test:
+    name: Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-15, ubuntu-latest]
+    steps:
+      - name: Set up Homebrew
+        id: homebrew
+        uses: Homebrew/actions/setup-homebrew@3cdb78d0f62ad29dd32de765782654f4eedea607 # 2026.08.31.1
+
+      - name: Check formula style and metadata
+        working-directory: ${{ steps.homebrew.outputs.repository-path }}
+        env:
+          TAP_NAME: ${{ steps.homebrew.outputs.tap-name }}
+        run: |
+          brew style Formula
+          brew audit --strict --tap="$TAP_NAME"
+
+      - name: Install and test formulae
+        working-directory: ${{ steps.homebrew.outputs.repository-path }}
+        env:
+          TAP_NAME: ${{ steps.homebrew.outputs.tap-name }}
+        run: |
+          for file in Formula/*.rb; do
+            formula="$TAP_NAME/$(basename "$file" .rb)"
+            brew install --build-from-source "$formula"
+            brew test "$formula"
+          done
