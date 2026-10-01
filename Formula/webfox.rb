@@ -1,8 +1,8 @@
 class Webfox < Formula
   desc "Search the web, extract pages, get answers, and run research"
   homepage "https://github.com/mavam/webfox"
-  url "https://registry.npmjs.org/webfox/-/webfox-4.5.0.tgz"
-  sha256 "a5bed097b5b7ac9ed38e75e373757652b3c6e074750db87da35913115e5b5b74"
+  url "https://registry.npmjs.org/webfox/-/webfox-4.6.0.tgz"
+  sha256 "b6214b46d88f7a7688db6ee36a92e54c3ba52816b830ce623f7c73404fd6e212"
   license "MIT"
 
   depends_on "node"
